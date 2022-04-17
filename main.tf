@@ -10,7 +10,7 @@ module "nfid" {
   client_secret = var.CLIENT_SECRET
   redirect_uri  = var.REDIRECT_URI
 
-  providers = {
-    aws = aws
-  }
+#   providers = {
+#     aws = aws
+#   }
 }
