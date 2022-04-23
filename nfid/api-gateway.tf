@@ -72,3 +72,27 @@ resource "aws_lambda_permission" "create_nfid_lambda_permission" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.nfid_api.execution_arn}/*/*/*"
 }
+
+
+/*
+  |==============================|
+  |    --- COINBASE AUTH ---     |
+  | first coinbase login request |
+  |==============================|
+*/
+resource "aws_api_gateway_integration" "create_coinbase_auth_init_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.nfid_api.id
+  resource_id             = aws_api_gateway_resource.create_nfid_resource.id
+  http_method             = aws_api_gateway_method.nfid_post_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.coinbase_auth_init_lambda.invoke_arn
+}
+
+resource "aws_lambda_permission" "create_coinbase_auth_init_lambda_permission" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.coinbase_auth_init_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.nfid_api.execution_arn}/*/*/*"
+}
