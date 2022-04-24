@@ -30,6 +30,7 @@ def lambda_handler(event, context):
         client_secret = os.environ.get("CLIENT_SECRET")
         redirect_uri = os.environ.get("REDIRECT_URI")
         jwt_secret = os.environ.get("JWT_SECRET")
+        table_name = os.environ.get("TABLE_NAME")
 
         code = json.loads(event["body"])["code"]
 
@@ -80,24 +81,24 @@ def lambda_handler(event, context):
         uid = user_data.get("id", "")
         name = user_data.get("name", "")
         email = user_data.get("name", "")
-        
+
         encoded_jwt = jwt.encode(
             {
-                'name': name,
-                'email': email,
-                'access_token': access_token,
-                'refresh_token': refresh_token,
-                'created_at': created_at,
-                'expires_in': expires_in,
-            }, 
-            jwt_secret, 
-            algorithm='HS256'
+                "name": name,
+                "email": email,
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "created_at": created_at,
+                "expires_in": expires_in,
+            },
+            jwt_secret,
+            algorithm="HS256",
         )
 
-        user_details = dynamodb.get_item(TableName="users", Key={"id": {"S": uid}})
+        user_details = dynamodb.get_item(TableName=table_name, Key={"id": {"S": uid}})
         if user_details.get("Item", "") == "":
             user_put = dynamodb.put_item(
-                TableName="users",
+                TableName=table_name,
                 Item={
                     "id": {"S": uid},
                     "email": {"S": email},
