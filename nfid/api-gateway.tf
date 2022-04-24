@@ -48,6 +48,65 @@ resource "aws_api_gateway_resource" "create_nfid_resource" {
   rest_api_id = aws_api_gateway_rest_api.nfid_api.id
 }
 
+resource "aws_api_gateway_method" "nfid_cors_method" {
+  rest_api_id   = aws_api_gateway_rest_api.nfid_api.id
+  resource_id   = aws_api_gateway_resource.create_nfid_resource.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "nfid_cors_integration" {
+  rest_api_id      = aws_api_gateway_rest_api.nfid_api.id
+  resource_id      = aws_api_gateway_resource.create_nfid_resource.id
+  http_method      = aws_api_gateway_method.nfid_cors_method.http_method
+  content_handling = "CONVERT_TO_TEXT"
+
+  type = "MOCK"
+
+  request_templates = {
+    "application/json" = "{ \"statusCode\": 200 }"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "nfid_cors_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.nfid_api.id
+  resource_id = aws_api_gateway_resource.create_nfid_resource.id
+  http_method = aws_api_gateway_method.nfid_cors_method.http_method
+  status_code = 200
+
+  depends_on = [
+    aws_api_gateway_integration.nfid_cors_integration,
+    aws_api_gateway_method_response.nfid_cors_method_response
+  ]
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Authorization, Content-Type'",
+    "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS, POST'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
+resource "aws_api_gateway_method_response" "nfid_cors_method_response" {
+  rest_api_id = aws_api_gateway_rest_api.nfid_api.id
+  resource_id = aws_api_gateway_resource.create_nfid_resource.id
+  http_method = aws_api_gateway_method.nfid_cors_method.http_method
+  status_code = 200
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+
+  depends_on = [
+    aws_api_gateway_method.nfid_cors_method
+  ]
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
 resource "aws_api_gateway_method" "nfid_post_method" {
   rest_api_id      = aws_api_gateway_rest_api.nfid_api.id
   resource_id      = aws_api_gateway_resource.create_nfid_resource.id

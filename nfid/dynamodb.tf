@@ -1,14 +1,9 @@
-resource "aws_dynamodb_table" "nfid_dynamodb" {
-  name         = "nfid_dynamodb"
+resource "aws_dynamodb_table" "nfid_users" {
+  name         = "nfid_users"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "nfid"
-  range_key    = "username"
+  hash_key     = "id"
   attribute {
-    name = "nfid"
-    type = "S"
-  }
-  attribute {
-    name = "username"
+    name = "id"
     type = "S"
   }
 }
