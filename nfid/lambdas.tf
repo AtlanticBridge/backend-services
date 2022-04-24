@@ -4,7 +4,7 @@ resource "null_resource" "nfid_layer_trigger" {
   }
 
   provisioner "local-exec" {
-    command = "${path.module}/code/build.sh"
+    command = "chmod +x ${path.module}/code/build.sh; ${path.module}/code/build.sh"
   }
 }
 
