@@ -1,5 +1,5 @@
 resource "aws_iam_role" "nfid_sign_in_lambda_role" {
-  name = "nfid_sign_in_lambda_role"
+  name = "nfid_sign_up_lambda_role"
 
   assume_role_policy = <<EOF
 {
