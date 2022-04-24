@@ -8,6 +8,8 @@ resource "aws_api_gateway_rest_api" "nfid_api" {
 
 resource "aws_api_gateway_deployment" "v1_deployment" {
   rest_api_id = aws_api_gateway_rest_api.nfid_api.id
+  
+  depends_on = ["aws_api_gateway_method.nfid_post_method", "aws_api_gateway_integration.create_nfid_integration"]
 
   triggers = {
     redeployment = sha1(jsonencode(timestamp()))
