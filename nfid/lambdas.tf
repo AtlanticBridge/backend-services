@@ -34,7 +34,7 @@ resource "aws_iam_role_policy" "nfid_sign_in_lambda_policy" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-              "${aws_dynamodb_table.nfid_dynamodb.arn}",
+              "${aws_dynamodb_table.nfid_users.arn}",
               "arn:aws:logs:*:*:*"
             ]
         }
