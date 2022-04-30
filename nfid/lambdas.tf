@@ -83,6 +83,7 @@ resource "aws_lambda_function" "nfid_sign_in_lambda" {
   handler          = "nfid_sign_in.lambda_handler"
   runtime          = "python3.8"
   timeout          = 15
+  layers           = [aws_lambda_layer_version.nfid_layer.arn]
 
   environment {
     variables = {
