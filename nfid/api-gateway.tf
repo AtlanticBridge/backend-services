@@ -19,6 +19,7 @@ resource "aws_api_gateway_deployment" "v1_deployment" {
   }
 }
 
+
 resource "aws_api_gateway_stage" "v1" {
   deployment_id = aws_api_gateway_deployment.v1_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.nfid_api.id
