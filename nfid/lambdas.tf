@@ -1,7 +1,7 @@
 resource "null_resource" "nfid_layer_trigger" {
-  triggers = {
-    build = "${base64sha256(file("${path.module}/code/requirements.txt"))}"
-  }
+  # triggers = {
+  #   build = "${base64sha256(file("${path.module}/code/requirements.txt"))}"
+  # }
 
   provisioner "local-exec" {
     command = "chmod +x ${path.module}/code/build.sh; ${path.module}/code/build.sh"
