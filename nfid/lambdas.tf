@@ -7,9 +7,9 @@ resource "null_resource" "nfid_layer_trigger" {
     build_number = "${timestamp()}"
   }
 
-  # provisioner "local-exec" {
-  #   command = "chmod +x ${path.module}/code/build.sh; ${path.module}/code/build.sh"
-  # }
+  provisioner "local-exec" {
+    command = "chmod +x ${path.module}/code/build.sh; ${path.module}/code/build.sh"
+  }
 }
 
 data "archive_file" "nfid_layer_file" {
