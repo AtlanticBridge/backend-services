@@ -1,33 +1,33 @@
-# resource "null_resource" "nfid_layer_trigger" {
-#   # triggers = {
-#   #   build = "${base64sha256(file("${path.module}/code/requirements.txt"))}"
-#   # }
+resource "null_resource" "nfid_layer_trigger" {
+  # triggers = {
+  #   build = "${base64sha256(file("${path.module}/code/requirements.txt"))}"
+  # }
 
-#   triggers = {
-#     build_number = "${timestamp()}"
-#   }
+  triggers = {
+    build_number = "${timestamp()}"
+  }
 
-#   provisioner "local-exec" {
-#     command = "chmod +x ${path.module}/code/build.sh; ${path.module}/code/build.sh"
-#   }
-# }
+  # provisioner "local-exec" {
+  #   command = "chmod +x ${path.module}/code/build.sh; ${path.module}/code/build.sh"
+  # }
+}
 
 data "archive_file" "nfid_layer_file" {
   type        = "zip"
   source_dir  = "${path.module}/code/dependencies/python"
   output_path = "${path.module}/code/dependencies/nfid_layer.zip"
-  # depends_on = [
-  #   "null_resource.nfid_layer_trigger"
-  # ]
+  depends_on = [
+    "null_resource.nfid_layer_trigger"
+  ]
 }
 
 resource "aws_lambda_layer_version" "nfid_layer" {
   filename            = data.archive_file.nfid_layer_file.output_path
   layer_name          = "nfid_layer"
   compatible_runtimes = ["python3.8"]
-  # depends_on = [
-  #   "null_resource.nfid_layer_trigger"
-  # ]
+  depends_on = [
+    "null_resource.nfid_layer_trigger"
+  ]
 }
 
 resource "aws_iam_role" "nfid_sign_in_lambda_role" {
