@@ -87,7 +87,6 @@ def lambda_handler(event, context):
                 "name": name,
                 "email": email,
                 "access_token": access_token,
-                "refresh_token": refresh_token,
                 "created_at": created_at,
                 "expires_in": expires_in,
             },
