@@ -7,7 +7,7 @@ echo ${PWD}
 echo ${BASEDIR}
 
 python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))'
-type -P python3 >/dev/null 2>&1 && echo Python 3 is installed
+type -P python3.8 >/dev/null 2>&1 && echo Python 3.8 is installed
 
 pip3 install --target ${PWD}/${BASEDIR}/dependencies/python -r ${PWD}/${BASEDIR}/requirements.txt
 echo pip3 --version
