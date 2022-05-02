@@ -3,6 +3,10 @@ resource "null_resource" "nfid_layer_trigger" {
   #   build = "${base64sha256(file("${path.module}/code/requirements.txt"))}"
   # }
 
+  triggers = {
+    build_number = "${timestamp()}"
+  }
+
   provisioner "local-exec" {
     command = "chmod +x ${path.module}/code/build.sh; ${path.module}/code/build.sh"
   }
