@@ -12,6 +12,13 @@ def lambda_handler(event, context):
     mint_private_key = os.getenv("MINT_PRIVATE_KEY")
     infura_url = os.getenv("INFURA_URL")
     nfid_contract_address = os.getenv("NFID_CONTRACT_ADDRESS")
+
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "OPTIONS, GET",
+        "Access-Control-Allow-Credentials": True,
+        "Access-Control-Allow-Headers": "x-api-key,Content-Type,DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin,Referer",
+    }
     
     logging.info(event)
     # dynamodb = boto3.client("dynamodb")
@@ -53,10 +60,12 @@ def lambda_handler(event, context):
         logging.error(e)
         return {
             'statusCode': 401,
+            'headers': headers,
             'body': json.dumps('Transaction to contract failed!')
         }
     
     return {
         'statusCode': 200,
+        'headers': headers,
         'body': json.dumps(approval_key)
     }
