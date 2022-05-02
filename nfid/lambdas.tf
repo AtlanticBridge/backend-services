@@ -15,7 +15,7 @@ resource "null_resource" "nfid_layer_trigger" {
 data "archive_file" "nfid_layer_file" {
   type        = "zip"
   source_dir  = "${path.module}/code/dependencies/python"
-  output_path = "${path.module}/code/dependencies/nfid_layer.zip"
+  output_path = "${path.module}/code/dependencies/python.zip"
   depends_on = [
     "null_resource.nfid_layer_trigger"
   ]
