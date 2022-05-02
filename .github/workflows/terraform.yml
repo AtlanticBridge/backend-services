@@ -27,8 +27,12 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: 3.8
+    - name: Check python
+      run: python --version
+    - name: Check pip
+      run: python3 -m pip --version 
     - name: Install dependencies
-      run: python3 -m pip3.8 install --target ./nfid/code/dependencies/python -r ./nfid/code/requirements.txt
+      run: python3 -m pip install --target ./nfid/code/dependencies/python -r ./nfid/code/requirements.txt
     # - name: Install dependencies
     #   run:  chmod +x ./nfid/code/build.sh
 
