@@ -12,6 +12,9 @@ data "archive_file" "nfid_layer_file" {
   type        = "zip"
   source_dir  = "${path.module}/code/dependencies/python"
   output_path = "${path.module}/code/dependencies/nfid_layer.zip"
+  depends_on = [
+    "null_resource.nfid_layer_trigger"
+  ]
 }
 
 resource "aws_lambda_layer_version" "nfid_layer" {
