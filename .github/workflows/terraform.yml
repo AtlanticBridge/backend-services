@@ -28,7 +28,7 @@ jobs:
       with:
         python-version: 3.8
     - name: Check python
-      run: python --version
+      run: python3 --version
     - name: Check pip
       run: python3 -m pip --version 
     - name: Install dependencies
