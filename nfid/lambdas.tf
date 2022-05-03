@@ -1,5 +1,37 @@
+resource "null_resource" "nfid_layer_trigger" {
+  # triggers = {
+  #   build = "${base64sha256(file("${path.module}/code/requirements.txt"))}"
+  # }
+
+  triggers = {
+    build_number = "${timestamp()}"
+  }
+
+  provisioner "local-exec" {
+    command = "chmod +x ${path.module}/code/build.sh; ${path.module}/code/build.sh"
+  }
+}
+
+data "archive_file" "nfid_layer_file" {
+  type        = "zip"
+  source_dir  = "${path.module}/code/dependencies/python"
+  output_path = "${path.module}/code/dependencies/python.zip"
+  depends_on = [
+    "null_resource.nfid_layer_trigger"
+  ]
+}
+
+resource "aws_lambda_layer_version" "nfid_layer" {
+  filename            = data.archive_file.nfid_layer_file.output_path
+  layer_name          = "nfid_layer"
+  compatible_runtimes = ["python3.8"]
+  depends_on = [
+    "null_resource.nfid_layer_trigger"
+  ]
+}
+
 resource "aws_iam_role" "nfid_sign_in_lambda_role" {
-  name = "nfid_sign_in_lambda_role"
+  name = "nfid_sign_up_lambda_role"
 
   assume_role_policy = <<EOF
 {
@@ -34,7 +66,7 @@ resource "aws_iam_role_policy" "nfid_sign_in_lambda_policy" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-              "${aws_dynamodb_table.nfid_dynamodb.arn}",
+              "${aws_dynamodb_table.nfid_users.arn}",
               "arn:aws:logs:*:*:*"
             ]
         }
@@ -58,12 +90,14 @@ resource "aws_lambda_function" "nfid_sign_in_lambda" {
   handler          = "nfid_sign_in.lambda_handler"
   runtime          = "python3.8"
   timeout          = 15
+  layers           = [aws_lambda_layer_version.nfid_layer.arn]
 
   environment {
     variables = {
       CLIENT_ID     = var.client_id
       CLIENT_SECRET = var.client_secret
       REDIRECT_URI  = var.redirect_uri
+      TABLE_NAME    = aws_dynamodb_table.nfid_users.id
     }
   }
 }
