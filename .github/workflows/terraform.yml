@@ -32,7 +32,7 @@ jobs:
     - name: Check pip
       run: python3 -m pip --version 
     - name: Install dependencies
-      run: python3 -m pip install --target ./nfid/code/dependencies/python/lib/python3.8/site-packages -r ./nfid/code/requirements.txt
+      run: python3 -m pip install --target ./nfid/code/dependencies/python -r ./nfid/code/requirements.txt
     # - name: Install dependencies
     #   run:  chmod +x ./nfid/code/build.sh
 
