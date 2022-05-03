@@ -12,7 +12,7 @@ type -P python3.8 >/dev/null 2>&1 && echo Python 3.8 is installed
 # pip3 install --target ${PWD}/${BASEDIR}/dependencies/python -r ${PWD}/${BASEDIR}/requirements.txt
 echo pip3 --version
 
-search_dir=${PWD}/${BASEDIR}/dependencies/python/lib/python3.8/site-packages
+search_dir=${PWD}/${BASEDIR}/dependencies/python
 for entry in "$search_dir"/*
 do
   echo "$entry"
