@@ -6,6 +6,7 @@ echo 'Print here'
 echo ${PWD}
 echo ${BASEDIR}
 
+python -c 'import sys; print(sys.version_info[:])'
 python3 -c 'import sys; print(".".join(map(str, sys.version_info[:3])))'
 type -P python3.8 >/dev/null 2>&1 && echo Python 3.8 is installed
 
