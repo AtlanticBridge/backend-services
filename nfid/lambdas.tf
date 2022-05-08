@@ -16,18 +16,13 @@ data "archive_file" "nfid_layer_file" {
   type        = "zip"
   source_dir  = "${path.module}/code/dependencies/python"
   output_path = "${path.module}/code/dependencies/python.zip"
-  depends_on = [
-    "null_resource.nfid_layer_trigger"
-  ]
 }
 
 resource "aws_lambda_layer_version" "nfid_layer" {
   filename            = data.archive_file.nfid_layer_file.output_path
   layer_name          = "nfid_layer"
   compatible_runtimes = ["python3.8"]
-  depends_on = [
-    "null_resource.nfid_layer_trigger"
-  ]
+  source_code_hash    = ${filebase64sha256("${path.module}/code/dependencies/python.zip")}
 }
 
 resource "aws_iam_role" "nfid_sign_in_lambda_role" {
