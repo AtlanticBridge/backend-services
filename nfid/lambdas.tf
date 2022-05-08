@@ -93,6 +93,7 @@ resource "aws_lambda_function" "nfid_sign_in_lambda" {
       CLIENT_SECRET = var.client_secret
       REDIRECT_URI  = var.redirect_uri
       TABLE_NAME    = aws_dynamodb_table.nfid_users.id
+      PYTHONPATH    = "/opt"
     }
   }
 }
