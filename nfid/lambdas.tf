@@ -22,7 +22,7 @@ resource "aws_lambda_layer_version" "nfid_layer" {
   filename            = data.archive_file.nfid_layer_file.output_path
   layer_name          = "nfid_layer"
   compatible_runtimes = ["python3.8"]
-  source_code_hash    = ${filebase64sha256("${path.module}/code/dependencies/python.zip")}
+  source_code_hash    = data.archive_file.nfid_layer_file.output_base64sha256
 }
 
 resource "aws_iam_role" "nfid_sign_in_lambda_role" {
