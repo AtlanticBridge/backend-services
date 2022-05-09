@@ -56,6 +56,7 @@ resource "aws_iam_role_policy" "nfid_sign_in_lambda_policy" {
             "Effect": "Allow",
             "Action": [
                 "dynamodb:PutItem",
+                "dynamodb:GetItem",
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
