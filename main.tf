@@ -26,4 +26,5 @@ module "nfid" {
   client_id     = var.CLIENT_ID
   client_secret = var.CLIENT_SECRET
   redirect_uri  = var.REDIRECT_URI
+  jwt_secret    = var.JWT_SECRET
 }
