@@ -9,3 +9,6 @@ variable "mint_private_key" {}
 variable "infura_url" {}
 
 variable "nfid_contract_address" {}
+
+variable "jwt_secret" {}
+

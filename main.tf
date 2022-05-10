@@ -29,4 +29,5 @@ module "nfid" {
   mint_private_key = var.MINT_PRIVATE_KEY
   infura_url = var.INFURA_URL
   nfid_contract_address = var.NFID_CONTRACT_ADDRESS
+  jwt_secret    = var.JWT_SECRET
 }

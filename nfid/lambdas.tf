@@ -16,18 +16,13 @@ data "archive_file" "nfid_layer_file" {
   type        = "zip"
   source_dir  = "${path.module}/code/dependencies/python"
   output_path = "${path.module}/code/dependencies/python.zip"
-  depends_on = [
-    "null_resource.nfid_layer_trigger"
-  ]
 }
 
 resource "aws_lambda_layer_version" "nfid_layer" {
   filename            = data.archive_file.nfid_layer_file.output_path
   layer_name          = "nfid_layer"
   compatible_runtimes = ["python3.8"]
-  depends_on = [
-    "null_resource.nfid_layer_trigger"
-  ]
+  source_code_hash    = data.archive_file.nfid_layer_file.output_base64sha256
 }
 
 resource "aws_iam_role" "nfid_sign_in_lambda_role" {
@@ -61,6 +56,7 @@ resource "aws_iam_role_policy" "nfid_sign_in_lambda_policy" {
             "Effect": "Allow",
             "Action": [
                 "dynamodb:PutItem",
+                "dynamodb:GetItem",
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
@@ -98,6 +94,8 @@ resource "aws_lambda_function" "nfid_sign_in_lambda" {
       CLIENT_SECRET = var.client_secret
       REDIRECT_URI  = var.redirect_uri
       TABLE_NAME    = aws_dynamodb_table.nfid_users.id
+      PYTHONPATH    = "/opt"
+      JWT_SECRET    = var.jwt_secret
     }
   }
 }
