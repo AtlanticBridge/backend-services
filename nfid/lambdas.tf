@@ -131,6 +131,7 @@ resource "aws_iam_role_policy" "nfid_refresh_token_lambda_policy" {
             "Effect": "Allow",
             "Action": [
                 "dynamodb:GetItem",
+                "dynamodb:PutItem"
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"

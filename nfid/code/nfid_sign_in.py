@@ -4,6 +4,8 @@ import requests
 import os
 import boto3
 import jwt
+import hashlib
+import uuid
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -82,8 +84,12 @@ def lambda_handler(event, context):
         name = user_data.get("name", "")
         email = user_data.get("name", "")
 
+        salt = uuid.uuid4().hex
+        hashed_uid = hashlib.sha512(name + email + salt).hexdigest()
+
         encoded_jwt = jwt.encode(
             {
+                "id": hashed_uid,
                 "name": name,
                 "email": email,
                 "access_token": access_token,
@@ -99,8 +105,10 @@ def lambda_handler(event, context):
             user_put = dynamodb.put_item(
                 TableName=table_name,
                 Item={
-                    "id": {"S": uid},
+                    "id": {"S": hashed_uid},
+                    "cid": {"S": uid},
                     "email": {"S": email},
+                    "salt": {"S": salt},
                     "refresh_token": {"S": auth_json["refresh_token"]},
                 },
             )

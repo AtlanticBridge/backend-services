@@ -2,9 +2,16 @@ import json
 import logging
 import os
 import requests
+import boto3
+import jwt
+import uuid
+import hashlib
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+dynamodb = boto3.client("dynamodb")
+
 
 def lambda_handler(event, context):
 
@@ -29,6 +36,18 @@ def lambda_handler(event, context):
 
         token = json.loads(event["body"])["token"]
 
+        decoded_token = jwt.decode(token, jwt_secret, algorithms="HS256")
+
+        print(decoded_token)
+
+        # verify valid token here
+
+        id = decoded_token["id"]
+
+        user_details = dynamodb.get_item(TableName=table_name, Key={"id": {"S": id}})
+        refresh_token = user_details.get("Item", {}).get("refresh_token", "")
+        salt = user_details.get("Item", {}).get("salt", "")
+
         auth_response = requests.post(
             "https://api.coinbase.com/oauth/token",
             params={
@@ -39,6 +58,65 @@ def lambda_handler(event, context):
             },
         )
 
+        auth_json = auth_response.json()
+
+        access_token = auth_json["access_token"]
+        refresh_token = auth_json["refresh_token"]
+        created_at = auth_json["created_at"]
+        expires_in = auth_json["expires_in"]
+
+        user_response = requests.get(
+            url="https://api.coinbase.com/v2/user",
+            headers={"Authorization": "Bearer " + access_token},
+        )
+
+        if user_response.status_code != 200:
+            logging.error(user_response.reason)
+            return {
+                "statusCode": 500,
+                "headers": headers,
+                "body": json.dumps("Failed to retrieve use information"),
+            }
+
+        user_json = user_response.json()
+
+        user_data = user_json["data"]
+
+        uid = user_data.get("id", "")
+        name = user_data.get("name", "")
+        email = user_data.get("name", "")
+
+        encoded_jwt = jwt.encode(
+            {
+                "id": id,
+                "name": name,
+                "email": email,
+                "access_token": access_token,
+                "created_at": created_at,
+                "expires_in": expires_in,
+            },
+            jwt_secret,
+            algorithm="HS256",
+        )
+
+        user_put = dynamodb.put_item(
+            TableName=table_name,
+            Item={
+                "id": {"S": id},
+                "cid": {"S": uid},
+                "email": {"S": email},
+                "salt": {"S": salt},
+                "refresh_token": {"S": auth_json["refresh_token"]},
+            },
+        )
+        if user_put.get("ResponseMetadata", {}).get("HTTPStatusCode", "") != 200:
+            return {
+                "statusCode": 500,
+                "headers": headers,
+                "body": json.dumps("User creation failed"),
+            }
+        logging.info(user_put)
+
     except Exception as e:
         logging.error(e)
         return {
@@ -47,4 +125,8 @@ def lambda_handler(event, context):
             "body": json.dumps("Internal server error"),
         }
 
-
+    return {
+        "statusCode": 200,
+        "headers": headers,
+        "body": json.dumps({"token": encoded_jwt}),
+    }
