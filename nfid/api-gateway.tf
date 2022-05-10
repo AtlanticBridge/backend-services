@@ -12,6 +12,8 @@ resource "aws_api_gateway_deployment" "v1_deployment" {
   triggers = {
     redeployment = sha1(jsonencode(timestamp()))
   }
+  
+  depends_on = ["aws_api_gateway_integration.refresh_login_integration"]
   lifecycle {
     create_before_destroy = true
   }
