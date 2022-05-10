@@ -1,14 +1,16 @@
 import json
 import logging
-import requests
 import os
+import requests
 import boto3
 import jwt
-import hashlib
 import uuid
+import hashlib
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+dynamodb = boto3.client("dynamodb")
 
 
 def lambda_handler(event, context):
@@ -25,8 +27,6 @@ def lambda_handler(event, context):
 
     logging.info(event)
 
-    dynamodb = boto3.client("dynamodb")
-
     try:
         client_id = os.environ.get("CLIENT_ID")
         client_secret = os.environ.get("CLIENT_SECRET")
@@ -34,34 +34,36 @@ def lambda_handler(event, context):
         jwt_secret = os.environ.get("JWT_SECRET")
         table_name = os.environ.get("TABLE_NAME")
 
-        code = json.loads(event["body"])["code"]
+        token = json.loads(event["body"])["token"]
+
+        decoded_token = jwt.decode(token, jwt_secret, algorithms="HS256")
+
+        print(decoded_token)
+
+        # verify valid token here
+
+        id = decoded_token["id"]
+
+        user_details = dynamodb.get_item(TableName=table_name, Key={"id": {"S": id}})
+        refresh_token = user_details.get("Item", {}).get("refresh_token", "")
+        salt = user_details.get("Item", {}).get("salt", "")
 
         auth_response = requests.post(
             "https://api.coinbase.com/oauth/token",
             params={
-                "grant_type": "authorization_code",
-                "code": code,
+                "grant_type": "refresh_token",
                 "client_id": client_id,
                 "client_secret": client_secret,
-                "redirect_uri": redirect_uri,
+                "refresh_token": refresh_token,
             },
         )
 
-        if auth_response.status_code != 200:
-            logging.error(auth_response.reason)
-            return {
-                "statusCode": 401,
-                "headers": headers,
-                "body": json.dumps("Authorization failed"),
-            }
-
         auth_json = auth_response.json()
+
         access_token = auth_json["access_token"]
         refresh_token = auth_json["refresh_token"]
         created_at = auth_json["created_at"]
         expires_in = auth_json["expires_in"]
-
-        logging.info(access_token)
 
         user_response = requests.get(
             url="https://api.coinbase.com/v2/user",
@@ -84,12 +86,9 @@ def lambda_handler(event, context):
         name = user_data.get("name", "")
         email = user_data.get("name", "")
 
-        salt = uuid.uuid4().hex
-        hashed_uid = hashlib.sha512(name + email + salt).hexdigest()
-
         encoded_jwt = jwt.encode(
             {
-                "id": hashed_uid,
+                "id": id,
                 "name": name,
                 "email": email,
                 "access_token": access_token,
@@ -100,25 +99,23 @@ def lambda_handler(event, context):
             algorithm="HS256",
         )
 
-        user_details = dynamodb.get_item(TableName=table_name, Key={"id": {"S": uid}})
-        if user_details.get("Item", "") == "":
-            user_put = dynamodb.put_item(
-                TableName=table_name,
-                Item={
-                    "id": {"S": hashed_uid},
-                    "cid": {"S": uid},
-                    "email": {"S": email},
-                    "salt": {"S": salt},
-                    "refresh_token": {"S": auth_json["refresh_token"]},
-                },
-            )
-            if user_put.get("ResponseMetadata", {}).get("HTTPStatusCode", "") != 200:
-                return {
-                    "statusCode": 500,
-                    "headers": headers,
-                    "body": json.dumps("User creation failed"),
-                }
-            logging.info(user_put)
+        user_put = dynamodb.put_item(
+            TableName=table_name,
+            Item={
+                "id": {"S": id},
+                "cid": {"S": uid},
+                "email": {"S": email},
+                "salt": {"S": salt},
+                "refresh_token": {"S": auth_json["refresh_token"]},
+            },
+        )
+        if user_put.get("ResponseMetadata", {}).get("HTTPStatusCode", "") != 200:
+            return {
+                "statusCode": 500,
+                "headers": headers,
+                "body": json.dumps("User creation failed"),
+            }
+        logging.info(user_put)
 
     except Exception as e:
         logging.error(e)
