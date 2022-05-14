@@ -100,7 +100,6 @@ resource "aws_lambda_function" "nfid_sign_in_lambda" {
   }
 }
 
-
 /*
   |========================|
   |    --- MINT KEY ---    |
@@ -177,3 +176,4 @@ resource "aws_lambda_function" "request_mint_key_lambda" {
     }
   }
 }
+
