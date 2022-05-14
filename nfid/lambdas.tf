@@ -170,9 +170,10 @@ resource "aws_lambda_function" "request_mint_key_lambda" {
 
   environment {
     variables = {
-      MINT_PRIVATE_KEY     = var.mint_private_key
-      INFURA_URL = var.infura_url
-      NFID_CONTRACT_ADDRESS  = var.nfid_contract_address
+      MINT_PRIVATE_KEY      = var.mint_private_key
+      INFURA_URL            = var.infura_url
+      NFID_CONTRACT_ADDRESS = var.nfid_contract_address
+      PYTHONPATH            = "/opt"
     }
   }
 }
