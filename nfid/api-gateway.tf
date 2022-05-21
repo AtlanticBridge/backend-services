@@ -251,7 +251,7 @@ NEED FOR EACH METHOD:
 
 resource "aws_api_gateway_resource" "create_mint_key_resource" {
   parent_id   = aws_api_gateway_rest_api.nfid_api.root_resource_id
-  parth_part  = "nfid_api"
+  path_part  = "create_mint_key"
   rest_api_id = aws_api_gateway_rest_api.nfid_api.id
 }
 
@@ -270,6 +270,12 @@ resource "aws_api_gateway_resource" "create_mint_key_resource" {
 #                       --- ITEM 1 ---
 #                       !!!!!!!!!!!!!!
 // MINT Post Method
+resource "aws_api_gateway_resource" "mint_key_resource" {
+  path_part   = "mint_key"
+  parent_id   = aws_api_gateway_rest_api.nfid_api.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.nfid_api.id
+}
+
 resource "aws_api_gateway_method" "mint_post_method" {
   authorization    = "NONE"
   http_method      = "POST"
