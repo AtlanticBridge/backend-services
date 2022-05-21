@@ -257,7 +257,7 @@ resource "aws_api_gateway_rest_api" "mint_api" {
 
 // ------------------------------------------------------------------------------
 
-resource "aws_api_getway_resource" "create_mint_key_resource" {
+resource "aws_api_gateway_resource" "create_mint_key_resource" {
   parent_id   = aws_api_gateway_rest_api.mint_api.root_resource_id
   parth_part  = "mint_api"
   rest_api_id = aws_api_gateway_rest_api.mint_api.id
@@ -305,7 +305,7 @@ resource "aws_api_gateway_integration" "create_mint_integration" {
   rest_api_id             = aws_api_gateway_rest_api.mint_api.id
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
-  uri                     = aws_lambda_function.requet_mint_key_lambda.invoke_arn
+  uri                     = aws_lambda_function.request_mint_key_lambda.invoke_arn
 }
 
 // CORS RESOURCE
