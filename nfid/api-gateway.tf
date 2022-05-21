@@ -304,6 +304,11 @@ resource "aws_api_gateway_integration" "create_mint_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.request_mint_key_lambda.invoke_arn
+
+  # This Depends On required if Lambda Function not initially created
+  depends_on              = [
+    aws_api_gateway_integration.create_mint_integration
+  ]
 }
 
 // CORS RESOURCE
