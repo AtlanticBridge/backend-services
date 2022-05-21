@@ -247,20 +247,12 @@ NEED FOR EACH METHOD:
   [4] aws_api_gateway_stage
 */
 
-resource "aws_api_gateway_rest_api" "mint_api" {
-  name        = "mint_api"
-  description = "API for Mint Key Lambda Function"
-  endpoint_configuration {
-    types = ["REGIONAL"]
-  }
-}
-
 // ------------------------------------------------------------------------------
 
 resource "aws_api_gateway_resource" "create_mint_key_resource" {
-  parent_id   = aws_api_gateway_rest_api.mint_api.root_resource_id
-  parth_part  = "mint_api"
-  rest_api_id = aws_api_gateway_rest_api.mint_api.id
+  parent_id   = aws_api_gateway_rest_api.nfid_api.root_resource_id
+  parth_part  = "nfid_api"
+  rest_api_id = aws_api_gateway_rest_api.nfid_api.id
 }
 
 # resource "aws_api_gateway_resource" "create_nfid_resource" {
@@ -282,13 +274,13 @@ resource "aws_api_gateway_method" "mint_post_method" {
   authorization    = "NONE"
   http_method      = "POST"
   api_key_required = true
-  rest_api_id      = aws_api_gateway_rest_api.mint_api.id
-  resource_id      = aws_api_getway_resource.mint_key_resource.id
+  rest_api_id      = aws_api_gateway_rest_api.nfid_api.id
+  resource_id      = aws_api_gateway_resource.mint_key_resource.id
 }
 
 // MINT CORS Method
 resource "aws_api_gateway_method" "mint_cors_method" {
-  rest_api_id   = aws_api_gateway_rest_api.mint_api.id
+  rest_api_id   = aws_api_gateway_rest_api.nfid_api.id
   resource_id   = aws_api_gateway_resource.create_mint_key_resource.id
   http_method   = "OPTIONS"
   authorization = "NONE"
@@ -302,7 +294,7 @@ resource "aws_api_gateway_method" "mint_cors_method" {
 resource "aws_api_gateway_integration" "create_mint_integration" {
   http_method             = aws_api_gateway_method.mint_post_method.http_method
   resource_id             = aws_api_gateway_resource.create_mint_key_resource.id
-  rest_api_id             = aws_api_gateway_rest_api.mint_api.id
+  rest_api_id             = aws_api_gateway_rest_api.nfid_api.id
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.request_mint_key_lambda.invoke_arn
@@ -312,7 +304,7 @@ resource "aws_api_gateway_integration" "create_mint_integration" {
 resource "aws_api_gateway_integration" "create_mint_cors_integration" {
   http_method      = aws_api_gateway_method.mint_cors_method.http_method
   resource_id      = aws_api_gateway_resource.create_mint_key_resource.id
-  rest_api_id      = aws_api_gateway_rest_api.mint_api.id
+  rest_api_id      = aws_api_gateway_rest_api.nfid_api.id
   content_handling = "CONVERT_TO_TEXT"
 
   type = "MOCK"
@@ -325,7 +317,7 @@ resource "aws_api_gateway_integration" "create_mint_cors_integration" {
 resource "aws_api_gateway_method_response" "mint_cors_method_response" {
   http_method = aws_api_gateway_method.mint_cors_method.http_method
   resource_id = aws_api_gateway_resource.create_mint_key_resource.id
-  rest_api_id = aws_api_gateway_rest_api.mint_api.id
+  rest_api_id = aws_api_gateway_rest_api.nfid_api.id
   status_code = 200
 
   response_models = {
@@ -346,7 +338,7 @@ resource "aws_api_gateway_method_response" "mint_cors_method_response" {
 resource "aws_api_gateway_integration_response" "mint_cors_integration_response" {
   http_method = aws_api_gateway_method.mint_cors_method.http_method
   resource_id = aws_api_gateway_resource.create_mint_key_resource.id
-  rest_api_id = aws_api_gateway_rest_api.mint_api.id
+  rest_api_id = aws_api_gateway_rest_api.nfid_api.id
   status_code = 200
 
   depends_on = [
@@ -361,51 +353,59 @@ resource "aws_api_gateway_integration_response" "mint_cors_integration_response"
   }
 }
 
-
-#                       !!!!!!!!!!!!!!
-#                       --- ITEM 3 ---
-#                       !!!!!!!!!!!!!!
-
-resource "aws_api_gateway_deployment" "v1_mint_deployment" {
-  rest_api_id = aws_api_gateway_rest_api.mint_api.id
-
-  triggers = {
-    redeployment = sha1(jsonencode(timestamp()))
-  }
-  lifecycle {
-    create_before_destroy = true
-  }
+resource "aws_lambda_permission" "mint_lambda_permission" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.request_mint_key_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.nfid_api.execution_arn}/*/*/*"
 }
 
-#                       !!!!!!!!!!!!!!
-#                       --- ITEM 4 ---
-#                       !!!!!!!!!!!!!!
 
-resource "aws_api_gateway_stage" "v1_mint" {
-  deployment_id = aws_api_gateway_deployment.v1_mint_deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.mint_api.id
-  stage_name    = "V1_mint"
-}
+# #                       !!!!!!!!!!!!!!
+# #                       --- ITEM 3 ---
+# #                       !!!!!!!!!!!!!!
 
-## USAGE PLAN ITEMS
+# resource "aws_api_gateway_deployment" "v1_mint_deployment" {
+#   rest_api_id = aws_api_gateway_rest_api.nfid_api.id
 
-resource "aws_api_gateway_usage_plan" "mint_usage_plan" {
-  name = "mint_usage_plan"
+#   triggers = {
+#     redeployment = sha1(jsonencode(timestamp()))
+#   }
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
-  api_stages {
-    api_id = aws_api_gateway_rest_api.mint_api.id
-    stage  = aws_api_gateway_stage.v1_mint.stage_name
-  }
-}
+# #                       !!!!!!!!!!!!!!
+# #                       --- ITEM 4 ---
+# #                       !!!!!!!!!!!!!!
 
-resource "aws_api_gateway_api_key" "mint_api_key" {
-  name = "mint_api_key"
-}
+# resource "aws_api_gateway_stage" "v1_mint" {
+#   deployment_id = aws_api_gateway_deployment.v1_mint_deployment.id
+#   rest_api_id   = aws_api_gateway_rest_api.nfid_api.id
+#   stage_name    = "V1_mint"
+# }
 
-resource "aws_api_gateway_usage_plan_key" "mint_usage_plan_key" {
-  key_id        = aws_api_gateway_api_key.mint_api_key.id
-  key_type      = "API_KEY"
-  usage_plan_id = aws_api_gateway_usage_plan.mint_usage_plan.id
-}
+# ## USAGE PLAN ITEMS
+
+# resource "aws_api_gateway_usage_plan" "mint_usage_plan" {
+#   name = "mint_usage_plan"
+
+#   api_stages {
+#     api_id = aws_api_gateway_rest_api.nfid_api.id
+#     stage  = aws_api_gateway_stage.v1_mint.stage_name
+#   }
+# }
+
+# resource "aws_api_gateway_api_key" "nfid_api_key" {
+#   name = "nfid_api_key"
+# }
+
+# resource "aws_api_gateway_usage_plan_key" "mint_usage_plan_key" {
+#   key_id        = aws_api_gateway_api_key.nfid_api_key.id
+#   key_type      = "API_KEY"
+#   usage_plan_id = aws_api_gateway_usage_plan.mint_usage_plan.id
+# }
 
 // ------------------------------------------------------------------------------
