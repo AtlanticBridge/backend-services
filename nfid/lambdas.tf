@@ -241,6 +241,7 @@ resource "aws_lambda_function" "request_mint_key_lambda" {
   handler          = "request_mint_key.lambda_handler"
   runtime          = "python3.8"
   timeout          = 15
+  layers           = [aws_lambda_layer_version.nfid_layer.arn]
 
   environment {
     variables = {
