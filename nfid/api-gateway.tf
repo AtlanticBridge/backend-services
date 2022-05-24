@@ -249,11 +249,11 @@ NEED FOR EACH METHOD:
 
 // ------------------------------------------------------------------------------
 
-resource "aws_api_gateway_resource" "create_mint_key_resource" {
-  parent_id   = aws_api_gateway_rest_api.nfid_api.root_resource_id
-  path_part  = "create_mint_key"
-  rest_api_id = aws_api_gateway_rest_api.nfid_api.id
-}
+# resource "aws_api_gateway_resource" "create_mint_key_resource" {
+#   parent_id   = aws_api_gateway_rest_api.nfid_api.root_resource_id
+#   path_part  = "create_mint_key"
+#   rest_api_id = aws_api_gateway_rest_api.nfid_api.id
+# }
 
 # resource "aws_api_gateway_resource" "create_nfid_resource" {
 #   path_part   = "create_nfid"
@@ -270,8 +270,8 @@ resource "aws_api_gateway_resource" "create_mint_key_resource" {
 #                       --- ITEM 1 ---
 #                       !!!!!!!!!!!!!!
 // MINT Post Method
-resource "aws_api_gateway_resource" "mint_key_resource" {
-  path_part   = "mint_key"
+resource "aws_api_gateway_resource" "create_mint_key_resource" {
+  path_part   = "create_mint_key"
   parent_id   = aws_api_gateway_rest_api.nfid_api.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.nfid_api.id
 }
@@ -281,7 +281,7 @@ resource "aws_api_gateway_method" "mint_post_method" {
   http_method      = "POST"
   api_key_required = true
   rest_api_id      = aws_api_gateway_rest_api.nfid_api.id
-  resource_id      = aws_api_gateway_resource.mint_key_resource.id
+  resource_id      = aws_api_gateway_resource.create_mint_key_resource.id
 }
 
 // MINT CORS Method
@@ -304,11 +304,23 @@ resource "aws_api_gateway_integration" "create_mint_integration" {
   type                    = "AWS_PROXY"
   integration_http_method = "POST"
   uri                     = aws_lambda_function.request_mint_key_lambda.invoke_arn
+}
 
-  # This Depends On required if Lambda Function not initially created
-  depends_on              = [
-    aws_api_gateway_integration.create_mint_integration
-  ]
+resource "aws_api_gateway_integration" "sign_in_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.nfid_api.id
+  rest_api_id             = aws_api_gateway_rest_api.nfid_api.id
+
+
+  resource_id             = aws_api_gateway_resource.sign_in_resource.id
+  resource_id             = aws_api_gateway_resource.create_mint_key_resource.id
+
+  http_method             = aws_api_gateway_method.nfid_post_method.http_method
+  http_method             = aws_api_gateway_method.mint_post_method.http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.nfid_sign_in_lambda.invoke_arn
+  uri                     = aws_lambda_function.request_mint_key_lambda.invoke_arn
 }
 
 // CORS RESOURCE
