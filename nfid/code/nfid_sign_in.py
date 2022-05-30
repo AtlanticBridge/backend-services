@@ -85,7 +85,7 @@ def lambda_handler(event, context):
         email = user_data.get("name", "")
 
         salt = uuid.uuid4().hex
-        hashed_uid = hashlib.sha512(name + email + salt).hexdigest()
+        hashed_uid = hashlib.sha512((name + email + salt).encode("utf-8")).hexdigest()
 
         encoded_jwt = jwt.encode(
             {
