@@ -148,8 +148,8 @@ EOF
 
 data "archive_file" "nfid_refresh_token_lambda_archive" {
   type        = "zip"
-  source_file = "${path.module}/code/nfid_sign_in.py"
-  output_path = "${path.module}/code/nfid_sign_in.zip"
+  source_file = "${path.module}/code/nfid_refresh_token.py"
+  output_path = "${path.module}/code/nfid_refresh_token.zip"
 }
 
 resource "aws_lambda_function" "nfid_refresh_token_lambda" {
