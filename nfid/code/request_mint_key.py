@@ -15,7 +15,7 @@ def lambda_handler(event, context):
 
     headers = {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "OPTIONS, GET",
+        "Access-Control-Allow-Methods": "OPTIONS, POST",
         "Access-Control-Allow-Credentials": True,
         "Access-Control-Allow-Headers": "x-api-key,Content-Type,DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,Accept,Origin,Referer",
     }
