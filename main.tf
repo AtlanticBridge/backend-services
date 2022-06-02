@@ -27,6 +27,7 @@ module "nfid" {
   client_secret         = var.CLIENT_SECRET
   redirect_uri          = var.REDIRECT_URI
   jwt_secret            = var.JWT_SECRET
+  id_secret             = var.ID_SECRET
   mint_private_key      = var.MINT_PRIVATE_KEY
   infura_url            = var.INFURA_URL
   nfid_contract_address = var.NFID_CONTRACT_ADDRESS

@@ -12,3 +12,5 @@ variable "nfid_contract_address" {}
 
 variable "jwt_secret" {}
 
+variable "id_secret" {}
+

@@ -33,6 +33,7 @@ def lambda_handler(event, context):
         redirect_uri = os.environ.get("REDIRECT_URI")
         jwt_secret = os.environ.get("JWT_SECRET")
         table_name = os.environ.get("TABLE_NAME")
+        salt = os.environ.get("ID_SECRET")
 
         token = json.loads(event["body"])["token"]
 
@@ -46,7 +47,6 @@ def lambda_handler(event, context):
 
         user_details = dynamodb.get_item(TableName=table_name, Key={"id": {"S": id}})
         refresh_token = user_details.get("Item", {}).get("refresh_token", "")
-        salt = user_details.get("Item", {}).get("salt", "")
 
         auth_response = requests.post(
             "https://api.coinbase.com/oauth/token",
@@ -55,6 +55,7 @@ def lambda_handler(event, context):
                 "client_id": client_id,
                 "client_secret": client_secret,
                 "refresh_token": refresh_token,
+                "redirect_uri": redirect_uri,
             },
         )
 
@@ -86,9 +87,11 @@ def lambda_handler(event, context):
         name = user_data.get("name", "")
         email = user_data.get("name", "")
 
+        hashed_uid = hashlib.sha512((name + email + salt).encode("utf-8")).hexdigest()
+
         encoded_jwt = jwt.encode(
             {
-                "id": id,
+                "id": hashed_uid,
                 "name": name,
                 "email": email,
                 "access_token": access_token,
@@ -102,7 +105,7 @@ def lambda_handler(event, context):
         user_put = dynamodb.put_item(
             TableName=table_name,
             Item={
-                "id": {"S": id},
+                "id": {"S": hashed_uid},
                 "cid": {"S": uid},
                 "email": {"S": email},
                 "salt": {"S": salt},
