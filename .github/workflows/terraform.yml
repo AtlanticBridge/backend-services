@@ -58,6 +58,7 @@ jobs:
         TF_VAR_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
         TF_VAR_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
         TF_VAR_JWT_SECRET: ${{ secrets.TF_JWT_SECRET }}
+        TF_VAR_ID_SECRET: ${{ secrets.TF_ID_SECRET }}
         TF_VAR_MINT_PRIVATE_KEY: ${{ secrets.MINT_PRIVATE_KEY }}
         TF_VAR_NFID_CONTRACT_ADDRESS: ${{ secrets.TF_NFID_CONTRACT_ADDRESS }}
         TF_VAR_INFURA_URL: ${{ secrets.TF_INFURA_URL }}
@@ -74,6 +75,7 @@ jobs:
         TF_VAR_ACCESS_KEY: ${{ secrets.TF_VAR_ACCESS_KEY }}
         TF_VAR_SECRET_KEY: ${{ secrets.TF_VAR_SECRET_KEY }}
         TF_VAR_JWT_SECRET: ${{ secrets.TF_JWT_SECRET }}
+        TF_VAR_ID_SECRET: ${{ secrets.TF_ID_SECRET }}
         TF_VAR_MINT_PRIVATE_KEY: ${{ secrets.MINT_PRIVATE_KEY }}
         TF_VAR_NFID_CONTRACT_ADDRESS: ${{ secrets.TF_NFID_CONTRACT_ADDRESS }}
         TF_VAR_INFURA_URL: ${{ secrets.TF_INFURA_URL }}
