@@ -96,6 +96,7 @@ resource "aws_lambda_function" "nfid_sign_in_lambda" {
       TABLE_NAME    = aws_dynamodb_table.nfid_users.id
       PYTHONPATH    = "/opt"
       JWT_SECRET    = var.jwt_secret
+      ID_SECRET     = var.id_secret
     }
   }
 }
@@ -171,6 +172,7 @@ resource "aws_lambda_function" "nfid_refresh_token_lambda" {
       TABLE_NAME    = aws_dynamodb_table.nfid_users.id
       PYTHONPATH    = "/opt"
       JWT_SECRET    = var.jwt_secret
+      ID_SECRET     = var.id_secret
     }
   }
 }

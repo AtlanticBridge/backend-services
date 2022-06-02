@@ -33,6 +33,7 @@ def lambda_handler(event, context):
         redirect_uri = os.environ.get("REDIRECT_URI")
         jwt_secret = os.environ.get("JWT_SECRET")
         table_name = os.environ.get("TABLE_NAME")
+        salt = os.environ.get("ID_SECRET")
 
         code = json.loads(event["body"])["code"]
 
@@ -84,8 +85,7 @@ def lambda_handler(event, context):
         name = user_data.get("name", "")
         email = user_data.get("name", "")
 
-        salt = uuid.uuid4().hex
-        hashed_uid = hashlib.sha512(name + email + salt).hexdigest()
+        hashed_uid = hashlib.sha512((name + email + salt).encode("utf-8")).hexdigest()
 
         encoded_jwt = jwt.encode(
             {
@@ -109,7 +109,7 @@ def lambda_handler(event, context):
                     "cid": {"S": uid},
                     "email": {"S": email},
                     "salt": {"S": salt},
-                    "refresh_token": {"S": auth_json["refresh_token"]},
+                    "refresh_token": {"S": refresh_token},
                 },
             )
             if user_put.get("ResponseMetadata", {}).get("HTTPStatusCode", "") != 200:

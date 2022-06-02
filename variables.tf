@@ -16,3 +16,5 @@ variable "NFID_CONTRACT_ADDRESS" {}
 
 variable "JWT_SECRET" {}
 
+variable "ID_SECRET" {}
+
