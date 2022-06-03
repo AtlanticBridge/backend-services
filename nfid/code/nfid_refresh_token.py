@@ -108,7 +108,6 @@ def lambda_handler(event, context):
                 "id": {"S": hashed_uid},
                 "cid": {"S": uid},
                 "email": {"S": email},
-                "salt": {"S": salt},
                 "refresh_token": {"S": auth_json["refresh_token"]},
             },
         )

@@ -100,25 +100,22 @@ def lambda_handler(event, context):
             algorithm="HS256",
         )
 
-        user_details = dynamodb.get_item(TableName=table_name, Key={"id": {"S": uid}})
-        if user_details.get("Item", "") == "":
-            user_put = dynamodb.put_item(
-                TableName=table_name,
-                Item={
-                    "id": {"S": hashed_uid},
-                    "cid": {"S": uid},
-                    "email": {"S": email},
-                    "salt": {"S": salt},
-                    "refresh_token": {"S": refresh_token},
-                },
-            )
-            if user_put.get("ResponseMetadata", {}).get("HTTPStatusCode", "") != 200:
-                return {
-                    "statusCode": 500,
-                    "headers": headers,
-                    "body": json.dumps("User creation failed"),
-                }
-            logging.info(user_put)
+        user_put = dynamodb.put_item(
+            TableName=table_name,
+            Item={
+                "id": {"S": hashed_uid},
+                "cid": {"S": uid},
+                "email": {"S": email},
+                "refresh_token": {"S": refresh_token},
+            },
+        )
+        if user_put.get("ResponseMetadata", {}).get("HTTPStatusCode", "") != 200:
+            return {
+                "statusCode": 500,
+                "headers": headers,
+                "body": json.dumps("User creation failed"),
+            }
+        logging.info(user_put)
 
     except Exception as e:
         logging.error(e)
