@@ -27,8 +27,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
     "Statement": [
         {
             "Effect": "Allow",
-            "Action": ${var.lambda_policy_actions},
-            "Resource":  ${var.lambda_policy_resources}
+            "Action": "${var.lambda_policy_actions}",
+            "Resource": "${var.lambda_policy_resources}"
         }
     ]
 }
