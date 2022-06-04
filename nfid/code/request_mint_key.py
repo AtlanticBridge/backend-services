@@ -36,7 +36,7 @@ def lambda_handler(event, context):
         factory_contract = web3.eth.contract(address=nfid_contract_address, abi=factory_abi)
 
         # Get the approved address to mint to
-        approved_address = event["body"]["address"]
+        approved_address = json.loads(event["body"])["params"]["address"]
 
         # Generate an approval key
         approval_key = hashlib.sha256((approved_address.encode() + os.urandom(32))).hexdigest()

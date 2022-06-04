@@ -228,10 +228,27 @@ resource "aws_iam_role_policy" "request_mint_key_lambda_policy" {
 EOF
 }
 
+data "template_file" "temp_mint_key" {
+  template = "${file("${path.module}/code/request_mint_key.py")}"
+}
+
+data "template_file" "abis_AtlanticId" {
+  template = "${file("${path.module}/code/abis/AtlanticId.json")}"
+}
+
 data "archive_file" "request_mint_key_archive" {
   type        = "zip"
-  source_file = "${path.module}/code/request_mint_key.py"
   output_path = "${path.module}/code/request_mint_key.zip"
+
+  source {
+    content  = "${data.template_file.temp_mint_key.rendered}"
+    filename = "request_mint_key.py"
+  }
+
+  source {
+    content  = "${data.template_file.abis_AtlanticId.rendered}"
+    filename = "abis/AtlanticId.json"
+  }
 }
 
 resource "aws_lambda_function" "request_mint_key_lambda" {
