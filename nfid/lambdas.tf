@@ -231,7 +231,13 @@ EOF
 data "archive_file" "request_mint_key_archive" {
   type        = "zip"
   source_file = "${path.module}/code/request_mint_key.py"
+  # soruce_dir  = "${path.module}/code/request_mint_key"
   output_path = "${path.module}/code/request_mint_key.zip"
+
+  source {
+    content  = "${data.template_file.abis_AtlanticId.rendered}"
+    filename = "abis/AtlanticId.json"
+  }
 }
 
 resource "aws_lambda_function" "request_mint_key_lambda" {
