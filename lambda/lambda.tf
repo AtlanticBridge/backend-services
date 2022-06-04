@@ -18,21 +18,29 @@ resource "aws_iam_role" "lambda_role" {
 EOF
 }
 
-resource "aws_iam_role_policy" "lambda_policy" {
-  name   = "${var.feature_name}_lambda_policy"
-  role   = aws_iam_role.lambda_role.id
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": ${var.lambda_policy_actions},
-            "Resource": ${var.lambda_policy_resources}
-        }
-    ]
-}
-EOF
+# resource "aws_iam_role_policy" "lambda_policy" {
+#   name   = "${var.feature_name}_lambda_policy"
+#   role   = aws_iam_role.lambda_role.id
+#   policy = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Action": ${var.lambda_policy_actions},
+#             "Resource": ${var.lambda_policy_resources}
+#         }
+#     ]
+# }
+# EOF
+# }
+
+data "aws_iam_policy_document" "lambda_policy" {
+  statement {
+    effect    = "Allow"
+    actions   = var.lambda_policy_actions
+    resources = var.lambda_policy_resources
+  }
 }
 
 data "archive_file" "lambda_archive" {
