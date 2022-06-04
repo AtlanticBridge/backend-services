@@ -228,6 +228,10 @@ resource "aws_iam_role_policy" "request_mint_key_lambda_policy" {
 EOF
 }
 
+data "template_file" "abis_AtlanticId" {
+  template = "${file("${path.module}/code/abis/AtlanticId.json")}"
+}
+
 data "archive_file" "request_mint_key_archive" {
   type        = "zip"
   source_file = "${path.module}/code/request_mint_key.py"
