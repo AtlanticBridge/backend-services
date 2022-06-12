@@ -54,8 +54,7 @@ def lambda_handler(event, context):
                 "grant_type": "refresh_token",
                 "client_id": client_id,
                 "client_secret": client_secret,
-                "refresh_token": refresh_token,
-                "redirect_uri": redirect_uri,
+                "refresh_token": refresh_token["S"],
             },
         )
 
