@@ -9,9 +9,9 @@ logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
 
-    # mint_private_key = os.getenv("MINT_PRIVATE_KEY")
-    # infura_url = os.getenv("INFURA_URL")
-    # nfid_contract_address = os.getenv("NFID_CONTRACT_ADDRESS")
+    mint_private_key = os.getenv("MINT_PRIVATE_KEY")
+    infura_url = os.getenv("INFURA_URL")
+    nfid_contract_address = os.getenv("NFID_CONTRACT_ADDRESS")
 
     headers = {
         "Access-Control-Allow-Origin": "*",
@@ -53,6 +53,7 @@ def lambda_handler(event, context):
     #     })
     #     signed_tx = web3.eth.account.sign_transaction(tx_hash, private_key=mint_private_key)
     #     hash_tx = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
+    #     print(web3.eth.wait_for_transaction_receipt(hash_tx))
     #     tx_receipt = web3.eth.wait_for_transaction_receipt(hash_tx)
     #     logging.info(tx_receipt)
     
@@ -68,5 +69,5 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'headers': headers,
         # 'body': json.dumps(approval_key)
-        'body': "approval_key"
+        'body': "_just_approval_key"
     }
